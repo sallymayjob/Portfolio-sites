@@ -1,578 +1,484 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sally Saclauso | AI Workflow Engineer</title>
+    <title>AI-Powered Content & Automation Projects - Sally Saclauso</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        /* Custom scrollbar to match the futuristic theme */
-        ::-webkit-scrollbar {
-            width: 10px;
+        body {
+            background-color: #000;
+            color: white;
+            overflow: hidden; /* Prevent scrolling */
         }
-        ::-webkit-scrollbar-track {
-            background: #020617; 
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155; 
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #06b6d4; 
+        ::selection {
+            background-color: #14b8a6; /* teal-500 */
+            color: white;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950">
+<body class="font-sans antialiased bg-slate-900">
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-6">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold tracking-tighter flex items-center gap-2">
-                <i data-lucide="cpu" class="text-cyan-400"></i>
-                <span>Sally<span class="text-cyan-400">.AI</span></span>
-            </a>
+    <!-- App Container -->
+    <div id="app" class="w-full h-full relative">
+        <!-- Content injected here by JS -->
+    </div>
 
-            <!-- Desktop Nav -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#about" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">About</a>
-                <a href="#services" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Services</a>
-                <a href="#projects" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Projects</a>
-                <a href="#results" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Results</a>
-                <a href="#contact" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Contact</a>
-                <a href="#contact" class="px-5 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500 hover:text-slate-950 transition-all font-medium text-sm">
-                    Work With Me
-                </a>
-            </div>
+    <!-- Navigation Controls (Fixed Overlay) -->
+    <div class="absolute bottom-6 left-0 right-0 z-50 flex items-center justify-between px-8 pointer-events-none">
+        <div id="slide-counter" class="text-slate-500 text-sm font-medium pointer-events-auto bg-slate-900/50 backdrop-blur px-3 py-1 rounded-full border border-slate-800">
+            Slide 1 / 12
+        </div>
 
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white">
-                <i data-lucide="menu" id="menu-icon"></i>
+        <div class="flex gap-2 pointer-events-auto">
+            <button onclick="prevSlide()" class="p-3 rounded-full bg-slate-800/80 hover:bg-teal-600 text-white transition-all border border-slate-700 backdrop-blur-sm" aria-label="Previous Slide">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <button onclick="nextSlide()" class="p-3 rounded-full bg-slate-800/80 hover:bg-teal-600 text-white transition-all border border-slate-700 backdrop-blur-sm" aria-label="Next Slide">
+                <i data-lucide="chevron-right" class="w-6 h-6"></i>
             </button>
         </div>
+    </div>
 
-        <!-- Mobile Nav Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 p-6 flex flex-col space-y-4">
-            <a href="#about" class="mobile-link text-lg text-slate-300 hover:text-cyan-400 font-medium">About</a>
-            <a href="#services" class="mobile-link text-lg text-slate-300 hover:text-cyan-400 font-medium">Services</a>
-            <a href="#projects" class="mobile-link text-lg text-slate-300 hover:text-cyan-400 font-medium">Projects</a>
-            <a href="#results" class="mobile-link text-lg text-slate-300 hover:text-cyan-400 font-medium">Results</a>
-            <a href="#contact" class="mobile-link text-lg text-slate-300 hover:text-cyan-400 font-medium">Contact</a>
-            <a href="#contact" class="mobile-link px-5 py-3 text-center rounded-lg bg-cyan-500 text-slate-950 font-bold">
-                Work With Me
-            </a>
-        </div>
-    </nav>
+    <!-- Click Zones for Touch/Mouse Navigation -->
+    <div class="absolute top-0 bottom-16 left-0 w-[10%] z-40 cursor-w-resize" onclick="prevSlide()"></div>
+    <div class="absolute top-0 bottom-16 right-0 w-[10%] z-40 cursor-e-resize" onclick="nextSlide()"></div>
 
-    <!-- Hero Section -->
-    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <!-- Background Gradients -->
-        <div class="absolute top-0 right-0 w-1/2 h-full bg-cyan-500/5 blur-[120px] rounded-full -translate-y-1/2 pointer-events-none"></div>
-        <div class="absolute bottom-0 left-0 w-1/3 h-full bg-blue-600/10 blur-[100px] rounded-full translate-y-1/2 pointer-events-none"></div>
+    <script>
+        // --- Helper Components (Functions returning HTML strings) ---
 
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="max-w-4xl mx-auto text-center">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-6">
-                    <i data-lucide="sparkles" size="14"></i>
-                    Future-Ready Workflows
+        const SlideLayout = (title, subtitle, content) => `
+            <div class="relative w-full h-full flex flex-col p-8 md:p-16 overflow-hidden bg-slate-900 text-white">
+                <!-- Abstract Background Elements -->
+                <div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute bottom-[-10%] left-[-5%] w-72 h-72 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Header -->
+                <div class="z-10 mb-8 border-l-4 border-teal-500 pl-4">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white">${title}</h2>
+                    ${subtitle ? `<p class="text-teal-400 text-lg mt-1 font-medium">${subtitle}</p>` : ''}
                 </div>
-                <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                    AI Social Media Manager <br />
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                        & Automation Specialist
-                    </span>
-                </h1>
-                <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                    Building high-impact content systems and AI-powered workflows for modern brands and future-ready Virtual Assistants.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#contact" class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] transition-all flex items-center justify-center gap-2">
-                        Work With Me <i data-lucide="arrow-right" size="18"></i>
-                    </a>
-                    <a href="#projects" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 border border-slate-700 text-white font-semibold hover:border-cyan-500 transition-all text-center">
-                        View Portfolio
-                    </a>
-                    <a href="#" class="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-transparent text-slate-400 hover:text-white font-medium flex items-center justify-center gap-2">
-                        <i data-lucide="download" size="18"></i> Resume
-                    </a>
+
+                <!-- Content -->
+                <div class="z-10 flex-1 relative flex flex-col justify-center">
+                    ${content}
                 </div>
             </div>
-        </div>
-    </header>
+        `;
 
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-slate-950 relative border-t border-slate-900">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col lg:flex-row items-center gap-16">
-                <div class="w-full lg:w-1/2 relative">
-                    <!-- Image Placeholder -->
-                    <div class="aspect-square rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 relative group">
-                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 mix-blend-overlay"></div>
-                        <img src="images/profile.png" alt="Sally Saclauso" class="w-full h-full object-cover relative z-10">
+        const Card = (content, className = "") => `
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl shadow-xl ${className}">
+                ${content}
+            </div>
+        `;
+
+        const StatCard = (value, label, iconName) => `
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center hover:border-teal-500/50 transition-colors duration-300">
+                ${iconName ? `<i data-lucide="${iconName}" class="w-8 h-8 text-teal-400 mb-3"></i>` : ''}
+                <div class="text-4xl md:text-5xl font-bold text-white mb-2">${value}</div>
+                <div class="text-slate-400 text-sm uppercase tracking-wider">${label}</div>
+            </div>
+        `;
+
+        const PlaceholderImage = (label, iconName) => `
+            <div class="w-full h-full min-h-[300px] bg-slate-800 rounded-2xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 group hover:border-teal-500/50 transition-colors">
+                <div class="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mb-4 group-hover:bg-slate-700/80">
+                    <i data-lucide="${iconName || 'layers'}" class="w-10 h-10 text-teal-400"></i>
+                </div>
+                <p class="font-medium text-lg">${label}</p>
+                <p class="text-xs mt-2 opacity-60">Visual Placeholder</p>
+            </div>
+        `;
+
+        // --- Slides Data (HTML Generators) ---
+
+        const slides = [
+            // Slide 1: Title
+            () => `
+                <div class="flex flex-col items-center justify-center h-full text-center z-10 relative overflow-hidden">
+                    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-slate-800 rounded-full opacity-30 animate-pulse"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-slate-700 rounded-full opacity-30"></div>
                     </div>
-                    <!-- Decorative Elements -->
-                    <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-center items-center shadow-xl">
-                        <span class="text-3xl font-bold text-cyan-400">50+</span>
-                        <span class="text-xs text-slate-400 text-center mt-1">AI Videos Produced</span>
+                    
+                    <div class="bg-teal-500/10 px-4 py-1 rounded-full text-teal-400 border border-teal-500/20 text-sm font-semibold tracking-wide mb-6 uppercase z-10">
+                        Portfolio Overview
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-white to-blue-400 pb-2 z-10">
+                        AI-Powered Content &<br />Automation Projects
+                    </h1>
+                    
+                    <p class="text-xl md:text-2xl text-slate-300 max-w-2xl font-light mb-8 z-10">
+                        Aug 2025 – Present
+                    </p>
+
+                    <div class="flex items-center gap-4 text-slate-400 z-10">
+                        <div class="h-px w-12 bg-slate-600"></div>
+                        <span class="text-lg font-medium text-white">Sally Saclauso</span>
+                        <div class="h-px w-12 bg-slate-600"></div>
+                    </div>
+
+                    <p class="mt-4 text-slate-500 text-sm uppercase tracking-widest z-10">
+                        AI Social Media Manager & Automation Specialist
+                    </p>
+                </div>
+            `,
+
+            // Slide 2: Introduction
+            () => SlideLayout("Project Overview", "A 5-Month Multi-Brand Initiative", `
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <p class="text-xl leading-relaxed text-slate-300 mb-8">
+                            “From August 2025 to today, I led a multi-project initiative focused on <span class="text-teal-400 font-semibold">AI content systems</span>, <span class="text-teal-400 font-semibold">workflow automation</span>, digital branding, and community engagement. This portfolio showcases the projects, outcomes, and automation frameworks I built that improved visibility, consistency, and production speed across multiple brands.”
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="brain" class="w-10 h-10 text-teal-400 mb-4"></i><span class="font-semibold text-white">AI Systems</span></div>`, "hover:bg-slate-800 transition-colors")}
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="workflow" class="w-10 h-10 text-blue-400 mb-4"></i><span class="font-semibold text-white">Automation</span></div>`, "hover:bg-slate-800 transition-colors")}
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="pen-tool" class="w-10 h-10 text-purple-400 mb-4"></i><span class="font-semibold text-white">Content</span></div>`, "hover:bg-slate-800 transition-colors")}
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="layout" class="w-10 h-10 text-pink-400 mb-4"></i><span class="font-semibold text-white">Workflow</span></div>`, "hover:bg-slate-800 transition-colors")}
                     </div>
                 </div>
+            `),
 
-                <div class="w-full lg:w-1/2">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-6">About Sally</h2>
-                    <div class="space-y-6 text-slate-400 leading-relaxed text-lg">
-                        <p>
-                            I’m Sally May Saclauso — an <span class="text-cyan-400 font-semibold">AI-powered Social Media Manager</span>, Automation Specialist, and creator of <strong class="text-white">Chewey School</strong>, the AI Learning Hub for kids and families. I combine creative storytelling with automation to help brands grow faster and smarter.
-                        </p>
-                        <p>
-                            I specialize in building AI-driven content engines, YouTube short-form systems, TikTok growth, n8n posting automation, and AI coaching experiences. I also mentor aspiring virtual assistants and give them customized GPT coaches to accelerate their learning journey.
-                        </p>
+            // Slide 3: Key Capabilities
+            () => SlideLayout("Key Capabilities", "Core Competencies & Expertise", `
+                <div class="grid md:grid-cols-2 gap-6">
+                    ${Card(`
+                        <h3 class="text-xl font-bold text-teal-400 mb-6 flex items-center gap-2">
+                            <i data-lucide="zap" class="w-5 h-5"></i> Strategic & Technical
+                        </h3>
+                        <ul class="space-y-4">
+                            ${[
+                                "AI Social Media Management",
+                                "Workflow Automation (Slack + Google Workspace)",
+                                "Brand Systems & Content Engines",
+                                "Data-Driven Strategy & Metrics"
+                            ].map(item => `
+                                <li class="flex items-center gap-3 text-slate-300">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-teal-500 shrink-0"></i>
+                                    ${item}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `, "h-full")}
+
+                    ${Card(`
+                        <h3 class="text-xl font-bold text-blue-400 mb-6 flex items-center gap-2">
+                            <i data-lucide="pen-tool" class="w-5 h-5"></i> Creative & Educational
+                        </h3>
+                        <ul class="space-y-4">
+                            ${[
+                                "Community Marketing Campaigns",
+                                "Custom GPT Coaching & Learning Systems",
+                                "Video & Visual Content Creation",
+                                "Digital Branding & Storytelling"
+                            ].map(item => `
+                                <li class="flex items-center gap-3 text-slate-300">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-blue-500 shrink-0"></i>
+                                    ${item}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `, "h-full")}
+                </div>
+            `),
+
+            // Slide 4: Project 1
+            () => SlideLayout("Chewey School AI Learning Hub", "Aug 2025 – Present", `
+                <div class="grid md:grid-cols-2 gap-12 items-center h-full">
+                    <div class="order-2 md:order-1 space-y-6">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs font-bold px-2 py-1 bg-teal-900 text-teal-300 rounded">Kids Learning</span>
+                            <span class="text-xs font-bold px-2 py-1 bg-blue-900 text-blue-300 rounded">AI Branding</span>
+                            <span class="text-xs font-bold px-2 py-1 bg-purple-900 text-purple-300 rounded">Automation</span>
+                        </div>
                         
-                        <div class="pt-6">
-                            <h4 class="text-white font-semibold mb-4 flex items-center gap-2"><i data-lucide="cpu" size="18" class="text-cyan-400"></i> Core Strengths</h4>
-                            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <li class="flex items-center gap-2 text-sm text-slate-300"><div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>AI Content Creation</li>
-                                <li class="flex items-center gap-2 text-sm text-slate-300"><div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>TikTok, Reels & Shorts</li>
-                                <li class="flex items-center gap-2 text-sm text-slate-300"><div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>Automation (n8n, Zapier)</li>
-                                <li class="flex items-center gap-2 text-sm text-slate-300"><div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>Google Workspace Systems</li>
-                                <li class="flex items-center gap-2 text-sm text-slate-300"><div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>Community Marketing</li>
-                                <li class="flex items-center gap-2 text-sm text-slate-300"><div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>Custom GPT Design</li>
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">Creative Director • Automation Specialist</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-white">Key Impact</h3>
+                            <ul class="space-y-3 text-slate-300">
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Built a full AI-powered content engine for a kids’ learning brand</li>
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Produced 33+ AI videos and multi-series content sets</li>
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Designed mascot, branding, and storytelling assets</li>
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Automated workflow for ideation → creation → posting</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2 h-full">
+                        ${PlaceholderImage("Chewey Mascot & Circuit Art", "brain")}
+                    </div>
+                </div>
+            `),
+
+            // Slide 5: Project 2
+            () => SlideLayout("DHT Community Campaign System", "Trick or Treat 2025 (Aug–Oct)", `
+                <div class="grid md:grid-cols-12 gap-8 h-full">
+                    <div class="md:col-span-5 flex flex-col justify-center space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">Campaign Designer • Automation & Media Lead</p>
+                        </div>
+                        <p class="text-slate-300">
+                            Built a digital event marketing system that automated registration, messaging, and content batching for a massive community event.
+                        </p>
+                    </div>
+                    
+                    <div class="md:col-span-7 grid grid-cols-2 gap-4 content-center">
+                        ${StatCard("56.2K", "Page Views", "monitor-play")}
+                        ${StatCard("974%", "Interaction Growth", "trending-up")}
+                        ${StatCard("1,309%", "Msg Increase", "message-square")}
+                        ${StatCard("1,236", "Participants", "users")}
+                    </div>
+                </div>
+            `),
+
+            // Slide 6: Project 3
+            () => SlideLayout("Custom GPT Coaching Program", "Aug 2025 – Present", `
+                <div class="grid md:grid-cols-2 gap-12 items-center h-full">
+                    <div class="h-full">
+                        ${PlaceholderImage("Personalized Coaching Cards", "users")}
+                    </div>
+                    <div class="space-y-8">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">AI Curriculum Designer • Automation Coach</p>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-teal-900/50 p-6 rounded-2xl shadow-xl">
+                            <h3 class="text-lg font-bold text-teal-400 mb-4">Program Achievements</h3>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 font-bold">1</div>
+                                    <span>Built multiple personalized GPT tutors for freelancers to accelerate learning curves.</span>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 font-bold">2</div>
+                                    <span>Designed automated workflow systems to guide student learning paths.</span>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 font-bold">3</div>
+                                    <span><strong>Result:</strong> Students achieved successful skill upgrades & 2 confirmed hires.</span>
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            `),
 
-    <!-- Services Section -->
-    <section id="services" class="py-20 bg-slate-900/30">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-bold mb-4">What I Do</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">Leveraging artificial intelligence to automate growth and engagement.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Service 1 -->
-                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300 group">
-                    <div class="mb-6 bg-slate-900 w-14 h-14 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="video" class="text-cyan-400" size="32"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">AI Social Media Management</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Reels, TikTok, Shorts Strategy</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>AI-generated graphics & videos</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Page growth & analytics</li>
-                    </ul>
-                </div>
-
-                <!-- Service 2 -->
-                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300 group">
-                    <div class="mb-6 bg-slate-900 w-14 h-14 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="sparkles" class="text-purple-400" size="32"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">AI Brand & Content Systems</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Brand persona creation</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Automated design systems</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Multi-platform content engines</li>
-                    </ul>
-                </div>
-
-                <!-- Service 3 -->
-                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300 group">
-                    <div class="mb-6 bg-slate-900 w-14 h-14 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="zap" class="text-yellow-400" size="32"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">Automation Engineering</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Google Workspace automation</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Sheets → Drive → Post</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>n8n, Make, Zapier setup</li>
-                    </ul>
-                </div>
-
-                <!-- Service 4 -->
-                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300 group">
-                    <div class="mb-6 bg-slate-900 w-14 h-14 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="users" class="text-green-400" size="32"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">Community & Events</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Campaign themes</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Event visuals & engagement</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Photobooth graphics</li>
-                    </ul>
-                </div>
-
-                <!-- Service 5 -->
-                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300 group">
-                    <div class="mb-6 bg-slate-900 w-14 h-14 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="bot" class="text-blue-400" size="32"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">Chewey School AI</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>AI mascot design</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Story-driven learning</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-400"><div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 group-hover:bg-cyan-500 transition-colors"></div>Kids coding AI visuals</li>
-                    </ul>
-                </div>
-
-                <!-- Signature Service - Featured -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-2xl border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.1)] relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                    <div class="absolute top-0 right-0 bg-cyan-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-bl-lg">SIGNATURE</div>
-                    <div class="mb-6 bg-slate-950/50 w-14 h-14 rounded-lg flex items-center justify-center border border-cyan-500/20">
-                        <i data-lucide="cpu" class="text-cyan-400" size="32"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4">Custom GPT VA Coach</h3>
-                    <p class="text-slate-400 text-sm mb-4">A personalized AI assistant I design for each student to guide them 24/7.</p>
-                    <ul class="space-y-2 mb-6">
-                        <li class="flex items-start gap-2 text-sm text-slate-300"><i data-lucide="check-circle-2" size="16" class="text-cyan-400 mt-0.5 shrink-0"></i>Admin & Lead Gen Guidance</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-300"><i data-lucide="check-circle-2" size="16" class="text-cyan-400 mt-0.5 shrink-0"></i>Database Management Skills</li>
-                        <li class="flex items-start gap-2 text-sm text-slate-300"><i data-lucide="check-circle-2" size="16" class="text-cyan-400 mt-0.5 shrink-0"></i>Daily Feedback & Modules</li>
-                    </ul>
-                    <a href="#contact" class="inline-flex items-center text-cyan-400 font-semibold hover:gap-2 transition-all">
-                        Get Your Coach <i data-lucide="arrow-right" size="16" class="ml-1"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured Projects -->
-    <section id="projects" class="py-20 bg-slate-950 border-t border-slate-900">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-5xl font-bold mb-16 text-center">Featured Work</h2>
-            
-            <div class="space-y-24">
-                <!-- Project 1 -->
-                <div class="flex flex-col lg:flex-row items-center gap-12">
-                    <div class="w-full lg:w-1/2">
-                        <div class="bg-slate-900 aspect-video rounded-xl border border-slate-800 flex items-center justify-center relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-slate-800/50 group-hover:bg-slate-800/30 transition-colors"></div>
-                            <img src="images/Chewey School.png" alt="Chewey School Project" class="w-full h-full object-cover relative z-10">
-                            <div class="absolute bottom-4 right-4 px-3 py-1 bg-slate-950/80 rounded-md text-xs font-mono text-cyan-400">
-                                Chewey School
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <h3 class="text-2xl md:text-3xl font-bold mb-4 text-white">Chewey School — AI Learning Hub</h3>
-                        <p class="text-slate-400 mb-6 text-lg">Developed the AI mascot 'Chewey' and produced an automated content pipeline for educational family content.</p>
-                        
-                        <div class="grid grid-cols-3 gap-4 mb-8">
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">TikTok Videos</div>
-                                <div class="text-cyan-400 font-bold">33 (0 ads)</div>
-                            </div>
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">YouTube Videos</div>
-                                <div class="text-cyan-400 font-bold">18 (2 weeks)</div>
-                            </div>
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Workflow</div>
-                                <div class="text-cyan-400 font-bold">Automated Ideation</div>
-                            </div>
+            // Slide 7: Project 4
+            () => SlideLayout("Social Media Automation Systems", "Multi-Channel Engine", `
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">AI Content Designer • Automation Engineer</p>
                         </div>
                         
-                        <div class="flex flex-wrap gap-2 mb-8">
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Content Creation</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Mascot Design</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">YouTube</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">TikTok</span>
-                        </div>
-                        
-                        <a href="https://tiktok.com/@chewey.school" class="text-white border-b border-cyan-500 pb-1 hover:text-cyan-400 transition-colors inline-flex items-center gap-2">
-                            View Project <i data-lucide="arrow-right" size="16"></i>
-                        </a>
+                        <ul class="space-y-6">
+                            <li class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                <strong class="block text-white mb-1">Automated Content Systems</strong>
+                                <span class="text-slate-400 text-sm">Engineered workflows for Reels, TikTok, and Instagram creation and scheduling.</span>
+                            </li>
+                            <li class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                <strong class="block text-white mb-1">Visual Asset Generation</strong>
+                                <span class="text-slate-400 text-sm">Created branded templates and short-form AI videos at scale.</span>
+                            </li>
+                            <li class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                <strong class="block text-white mb-1">Consistency Engine</strong>
+                                <span class="text-slate-400 text-sm">Built a multi-channel posting engine to ensure brand visibility without manual burnout.</span>
+                            </li>
+                        </ul>
                     </div>
-                </div>
 
-                <!-- Project 2 -->
-                <div class="flex flex-col lg:flex-row-reverse items-center gap-12">
-                    <div class="w-full lg:w-1/2">
-                        <div class="bg-slate-900 aspect-video rounded-xl border border-slate-800 flex items-center justify-center relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-slate-800/50 group-hover:bg-slate-800/30 transition-colors"></div>
-                            <img src="images/Generalist VA.png" alt="DHT Home Owners Event Page" class="w-full h-full object-cover relative z-10">
-                            <div class="absolute bottom-4 right-4 px-3 py-1 bg-slate-950/80 rounded-md text-xs font-mono text-cyan-400">
-                                DHT Home Owners
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <h3 class="text-2xl md:text-3xl font-bold mb-4 text-white">DHT Home Owners Event Page</h3>
-                        <p class="text-slate-400 mb-6 text-lg">Full event campaign management including creative direction for 'Trick or Treat' and engagement systems.</p>
-                        
-                        <div class="grid grid-cols-3 gap-4 mb-8">
-                             <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Page Views</div>
-                                <div class="text-cyan-400 font-bold">56,071 (↑1,110%)</div>
-                            </div>
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Interactions</div>
-                                <div class="text-cyan-400 font-bold">1,246 (↑974%)</div>
-                            </div>
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Msg Increase</div>
-                                <div class="text-cyan-400 font-bold">1,509%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex flex-wrap gap-2 mb-8">
-                             <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Event Marketing</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Community Management</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Analytics</span>
-                        </div>
-                        
-                        <a href="https://www.facebook.com/profile.php?id=61581681435966" class="text-white border-b border-cyan-500 pb-1 hover:text-cyan-400 transition-colors inline-flex items-center gap-2">
-                            View Project <i data-lucide="arrow-right" size="16"></i>
-                        </a>
-                    </div>
-                </div>
-
-                 <!-- Project 3 -->
-                 <div class="flex flex-col lg:flex-row items-center gap-12">
-                    <div class="w-full lg:w-1/2">
-                        <div class="bg-slate-900 aspect-video rounded-xl border border-slate-800 flex items-center justify-center relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-slate-800/50 group-hover:bg-slate-800/30 transition-colors"></div>
-                            <img src="images/Custom GPT.png" alt="Custom GPT Coaching Program" class="w-full h-full object-cover relative z-10">
-                            <div class="absolute bottom-4 right-4 px-3 py-1 bg-slate-950/80 rounded-md text-xs font-mono text-cyan-400">
-                                Custom GPT Coach
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <h3 class="text-2xl md:text-3xl font-bold mb-4 text-white">Custom GPT Coaching Program</h3>
-                        <p class="text-slate-400 mb-6 text-lg">Designed personalized GPT tutors and learning modules for aspiring Virtual Assistants, leading to successful career placements.</p>
-                        
-                        <div class="grid grid-cols-3 gap-4 mb-8">
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Role</div>
-                                <div class="text-cyan-400 font-bold">AI Curriculum Designer</div>
-                            </div>
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Outcome</div>
-                                <div class="text-cyan-400 font-bold">Improved Learning Speed</div>
-                            </div>
-                            <div class="border-l-2 border-slate-800 pl-4">
-                                <div class="text-xs text-slate-500 uppercase font-semibold">Success</div>
-                                <div class="text-cyan-400 font-bold">Jobs Secured</div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex flex-wrap gap-2 mb-8">
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">AI Engineering</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Education</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">Prompt Engineering</span>
-                        </div>
-                        
-                        <a href="https://chatgpt.com/g/g-692fe9a6e71081918d7bc7bd0b5f06b2-generalist-va-30-day-starter-coach" class="text-white border-b border-cyan-500 pb-1 hover:text-cyan-400 transition-colors inline-flex items-center gap-2">
-                            View Project <i data-lucide="arrow-right" size="16"></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Tech Stack -->
-    <section class="py-16 bg-slate-900/50">
-        <div class="container mx-auto px-6">
-            <h3 class="text-center text-slate-400 uppercase tracking-widest text-sm font-semibold mb-10 flex items-center justify-center gap-2">
-                <i data-lucide="zap" size="16" class="text-cyan-400"></i> Powered By
-            </h3>
-            <div class="flex flex-wrap justify-center gap-4 md:gap-6">
-                <!-- Tech Pills -->
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Gemini 3.0</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Google AI Studio</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">ChatGPT GPT Builder</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Midjourney</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">NotebookLM</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Perplexity</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">n8n</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Make</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Zapier</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Apps Script</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Google Sheets & Dashboard</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Google Docs</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">CapCut</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">Canva Pro</div>
-                <div class="px-5 py-3 bg-slate-950 border border-slate-800 rounded-full text-slate-300 font-medium hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all cursor-default text-sm">TikTok Studio</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="py-20 bg-slate-950 relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-        <div class="container mx-auto px-6 relative z-10">
-            <h2 class="text-3xl md:text-5xl font-bold mb-16 text-center">What Students Say</h2>
-            
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- Testimonial 1 -->
-                <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 relative">
-                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-slate-950 font-serif text-2xl font-bold">"</div>
-                    <p class="text-slate-300 italic mb-6 leading-relaxed relative z-10">Having a custom GPT designed by Sally as my guide made my learning journey smoother and more exciting. It felt like I had a mentor 24/7.</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500"></div>
-                        <div>
-                            <h4 class="font-bold text-white">Rona Mirandilla</h4>
-                            <p class="text-xs text-slate-500 uppercase tracking-wide">VA Student</p>
-                        </div>
-                    </div>
-                </div>
-                 <!-- Testimonial 2 -->
-                 <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 relative">
-                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-slate-950 font-serif text-2xl font-bold">"</div>
-                    <p class="text-slate-300 italic mb-6 leading-relaxed relative z-10">Her AI coaching system helped me enter the world of AI and data analytics with confidence I didn't think was possible.</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500"></div>
-                        <div>
-                            <h4 class="font-bold text-white">Princess Melody</h4>
-                            <p class="text-xs text-slate-500 uppercase tracking-wide">Data Analytics Student</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Analytics Summary -->
-    <section id="results" class="py-20 bg-gradient-to-br from-slate-900 to-blue-900/20">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="text-4xl md:text-5xl font-bold text-white mb-2">56k+</div>
-                    <div class="text-sm text-cyan-400 uppercase tracking-wider font-semibold">Page Views Generated</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl md:text-5xl font-bold text-white mb-2">974%</div>
-                    <div class="text-sm text-cyan-400 uppercase tracking-wider font-semibold">Increase in Interactions</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl md:text-5xl font-bold text-white mb-2">50+</div>
-                    <div class="text-sm text-cyan-400 uppercase tracking-wider font-semibold">AI Videos Produced</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl md:text-5xl font-bold text-white mb-2">2</div>
-                    <div class="text-sm text-cyan-400 uppercase tracking-wider font-semibold">Students Hired via AI</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-slate-950 border-t border-slate-900">
-        <div class="container mx-auto px-6">
-            <div class="max-w-4xl mx-auto bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 flex flex-col md:flex-row">
-                <div class="p-10 md:w-1/2 flex flex-col justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold mb-4">Let's Build Your <br/><span class="text-cyan-400">AI-Powered Brand</span></h2>
-                        <p class="text-slate-400 mb-8">Ready to automate your content and supercharge your growth? Let's talk.</p>
-                        
-                        <div class="space-y-4">
-                            <a href="mailto:sallymayjob@gmail.com" class="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-cyan-400">
-                                    <i data-lucide="mail" size="18"></i>
+                    <div class="flex flex-col justify-center">
+                        <h3 class="text-center text-slate-500 uppercase tracking-widest mb-8 text-sm">Tech Stack Integrated</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            ${["TikTok", "Instagram", "Canva", "ChatGPT", "Gemini", "Zapier", "Make.com"].map(tool => `
+                                <div class="flex flex-col items-center justify-center p-4 bg-slate-800 rounded-lg border border-slate-700 hover:border-teal-500 transition-colors">
+                                    <span class="font-medium text-white">${tool}</span>
                                 </div>
-                                sallymayjob@gmail.com
-                            </a>
-                            <div class="flex items-center gap-3 text-slate-300">
-                                <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-cyan-400">
-                                    <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-                                </div>
-                                Based in Davao City, Philippines
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `),
+
+            // Slide 8: Project 5
+            () => SlideLayout("Portfolio & Brand Ecosystem", "Aug 2025 – Present", `
+                <div class="grid md:grid-cols-2 gap-12 items-center h-full">
+                    <div class="h-full">
+                        ${PlaceholderImage("Portfolio Home Layout & Thumbnails", "layout")}
+                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">Digital Portfolio Architect</p>
+                        </div>
+                        <div class="prose prose-invert">
+                            <p class="text-xl text-slate-300">
+                                Built an entire AI-driven portfolio ecosystem that integrates slide decks, case studies, and content pipelines into a unified experience.
+                            </p>
+                        </div>
+                        <div class="bg-slate-800/50 backdrop-blur-sm border-l-4 border-l-teal-500 border-t border-r border-b border-slate-700 p-6 rounded-r-2xl shadow-xl">
+                            <h4 class="font-bold text-white mb-2">Outcome</h4>
+                            <p class="text-slate-400">Positioned brand identity as AI-forward, creative, and automation-driven, differentiating from traditional portfolios.</p>
+                        </div>
+                    </div>
+                </div>
+            `),
+
+            // Slide 9: Metrics
+            () => SlideLayout("Impact Metrics", "Aug 2025 – Present", `
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 h-full content-center">
+                    ${StatCard("56K+", "Page Views Generated", "monitor-play")}
+                    ${StatCard("974%", "Interaction Increase", "trending-up")}
+                    ${StatCard("50+", "AI Videos Produced", "video")}
+                    ${StatCard("2", "Hires via AI Coaching", "users")}
+                    ${StatCard("3", "Major Campaigns", "layers")}
+                    ${StatCard("∞", "Workflows Designed", "workflow")}
+                </div>
+            `),
+
+            // Slide 10: Testimonials
+            () => SlideLayout("What Clients & Students Say", "Feedback & Results", `
+                <div class="grid md:grid-cols-2 gap-8 h-full content-center">
+                    <div class="relative p-8 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="absolute top-0 right-0 p-6 opacity-20 text-6xl text-teal-500 font-serif leading-none">"</div>
+                        <p class="text-slate-300 text-lg leading-relaxed italic mb-6">
+                            "[Student Name/Quote from portfolio page 2] - The automated workflows totally changed how I approach my daily tasks. I'm saving hours every week."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center font-bold text-white">S</div>
+                            <div>
+                                <p class="font-bold text-white">Student / Client</p>
+                                <p class="text-xs text-teal-400">Freelancer</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="relative p-8 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="absolute top-0 right-0 p-6 opacity-20 text-6xl text-blue-500 font-serif leading-none">"</div>
+                        <p class="text-slate-300 text-lg leading-relaxed italic mb-6">
+                            "[Second Quote from portfolio page 2] - Sally's coaching on Custom GPTs helped me land a new contract. The system she built is incredible."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-bold text-white">C</div>
+                            <div>
+                                <p class="font-bold text-white">Client / Student</p>
+                                <p class="text-xs text-blue-400">Coaching Program</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-xs text-slate-500 mt-6">* Placeholders used for specific quotes from uploaded document.</p>
+            `),
+
+            // Slide 11: Stack
+            () => SlideLayout("Tools & Automation Stack", "The Engine Behind The Work", `
+                <div class="flex flex-col items-center justify-center h-full space-y-12">
+                    <div class="flex flex-wrap justify-center gap-4 max-w-4xl">
+                        ${[
+                            "ChatGPT", "Gemini", "Notion", "Canva", 
+                            "Zapier", "Make.com", "Google Drive", 
+                            "TikTok Studio", "CapCut", "Slack", "Midjourney"
+                        ].map(tech => `
+                            <div class="bg-slate-800 border border-slate-600 px-6 py-4 rounded-2xl text-xl font-medium text-white hover:scale-105 hover:border-teal-500 transition-all shadow-lg hover:shadow-teal-500/20 cursor-default">
+                                ${tech}
+                            </div>
+                        `).join('')}
                     </div>
                     
-                    <div class="mt-10">
-                        <p class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Connect Socially</p>
-                        <div class="flex gap-4">
-                            <a href="https://linkedin.com/in/sallysaclauso" target="_blank" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-cyan-500 hover:text-slate-950 hover:border-cyan-500 transition-all duration-300">
-                                <i data-lucide="linkedin" size="20"></i>
-                            </a>
-                            <a href="https://tiktok.com/@chewey.school" target="_blank" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-cyan-500 hover:text-slate-950 hover:border-cyan-500 transition-all duration-300">
-                                <i data-lucide="video" size="20"></i>
-                            </a>
-                            <a href="https://www.facebook.com/profile.php?id=61583813428638" target="_blank" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-cyan-500 hover:text-slate-950 hover:border-cyan-500 transition-all duration-300">
-                                <i data-lucide="facebook" size="20"></i>
-                            </a>
-                        </div>
+                    <p class="text-slate-400 text-lg max-w-2xl text-center border-t border-slate-800 pt-8">
+                        “These tools power my automation workflows, content engines, and multi-brand systems.”
+                    </p>
+                </div>
+            `),
+
+            // Slide 12: Conclusion
+            () => SlideLayout("", "", `
+                <div class="flex flex-col items-center justify-center text-center h-full z-10">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-teal-500 to-blue-600 rounded-full mb-8 flex items-center justify-center shadow-lg shadow-teal-500/30">
+                        <i data-lucide="zap" class="w-10 h-10 text-white"></i>
+                    </div>
+                    
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                        Let’s Build Your <br/><span class="text-teal-400">AI-Powered Content Engine.</span>
+                    </h2>
+                    
+                    <p class="text-xl text-slate-300 mb-12 max-w-2xl">
+                        Available for EA, Automation Specialist, Workflow Builder & Social Media Automation roles.
+                    </p>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto text-white">
+                        <button class="flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1 shadow-lg shadow-teal-500/20">
+                            <i data-lucide="calendar" class="w-5 h-5"></i> Book a Call
+                        </button>
+                        <button class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1">
+                            <i data-lucide="layout" class="w-5 h-5"></i> View Full Portfolio
+                        </button>
+                        <button class="flex items-center justify-center gap-2 bg-[#0077b5] hover:bg-[#006396] px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i> Connect on LinkedIn
+                        </button>
                     </div>
                 </div>
+            `)
+        ];
 
-                <div class="p-10 md:w-1/2 bg-slate-800/50">
-                    <div class="h-full flex flex-col justify-center space-y-4">
-                        <a href="https://calendly.com/sallymaysaclauso/30min?month=2025-11&date=2025-11-26" target="_blank" class="w-full py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2">
-                            <i data-lucide="calendar" size="20"></i> Book a Consultation
-                        </a>
-                        <a href="https://www.facebook.com/profile.php?id=61583813428638" target="_blank" class="w-full py-4 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold hover:bg-slate-700 transition-colors flex items-center justify-center">
-                            Message on Facebook
-                        </a>
-                        <a href="https://chatgpt.com/g/g-692fe9a6e71081918d7bc7bd0b5f06b2-generalist-va-30-day-starter-coach" target="_blank" class="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                            <i data-lucide="bot" size="20"></i> Get Custom GPT Coach
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        // --- Logic ---
 
-    <!-- Footer -->
-    <footer class="py-8 bg-slate-950 border-t border-slate-900 text-center text-slate-500 text-sm">
-        <p>© <span id="year"></span> Sally May Saclauso. AI Workflow Engineer.</p>
-    </footer>
+        let currentSlideIndex = 0;
+        const app = document.getElementById('app');
+        const counter = document.getElementById('slide-counter');
 
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        function renderSlide() {
+            // Render content
+            app.innerHTML = slides[currentSlideIndex]();
+            
+            // Update counter
+            counter.innerText = `Slide ${currentSlideIndex + 1} / ${slides.length}`;
+            
+            // Re-initialize icons for the new content
+            lucide.createIcons();
+        }
 
-        // Update Year
-        document.getElementById('year').textContent = new Date().getFullYear();
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            renderSlide();
+        }
 
-        // Mobile Menu Logic
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
-        const menuIcon = document.getElementById('menu-icon');
-        let isMenuOpen = false;
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+            renderSlide();
+        }
 
-        mobileMenuBtn.addEventListener('click', () => {
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                mobileMenu.classList.remove('hidden');
-                menuIcon.setAttribute('data-lucide', 'x');
-            } else {
-                mobileMenu.classList.add('hidden');
-                menuIcon.setAttribute('data-lucide', 'menu');
-            }
-            lucide.createIcons(); // Re-render icons if changed
-        });
-
-        // Close menu when a link is clicked
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                isMenuOpen = false;
-                mobileMenu.classList.add('hidden');
-                menuIcon.setAttribute('data-lucide', 'menu');
-                lucide.createIcons();
-            });
-        });
-
-        // Navbar Scroll Effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 20) {
-                navbar.classList.add('bg-slate-950/90', 'backdrop-blur-md', 'border-b', 'border-slate-800', 'py-4');
-                navbar.classList.remove('bg-transparent', 'py-6');
-            } else {
-                navbar.classList.remove('bg-slate-950/90', 'backdrop-blur-md', 'border-b', 'border-slate-800', 'py-4');
-                navbar.classList.add('bg-transparent', 'py-6');
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
             }
         });
+
+        // Initial Render
+        renderSlide();
+
     </script>
 </body>
 </html>
