@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Content & Automation Projects - Sally Saclauso</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            background-color: #000;
+            color: white;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        ::selection {
+            background-color: #14b8a6; /* teal-500 */
+            color: white;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900">
+
+    <!-- App Container -->
+    <div id="app" class="w-full h-full relative">
+        <!-- Content injected here by JS -->
+    </div>
+
+    <!-- Navigation Controls (Fixed Overlay) -->
+    <div class="absolute bottom-6 left-0 right-0 z-50 flex items-center justify-between px-8 pointer-events-none">
+        <div id="slide-counter" class="text-slate-500 text-sm font-medium pointer-events-auto bg-slate-900/50 backdrop-blur px-3 py-1 rounded-full border border-slate-800">
+            Slide 1 / 12
+        </div>
+
+        <div class="flex gap-2 pointer-events-auto">
+            <button onclick="prevSlide()" class="p-3 rounded-full bg-slate-800/80 hover:bg-teal-600 text-white transition-all border border-slate-700 backdrop-blur-sm" aria-label="Previous Slide">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <button onclick="nextSlide()" class="p-3 rounded-full bg-slate-800/80 hover:bg-teal-600 text-white transition-all border border-slate-700 backdrop-blur-sm" aria-label="Next Slide">
+                <i data-lucide="chevron-right" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Click Zones for Touch/Mouse Navigation -->
+    <div class="absolute top-0 bottom-16 left-0 w-[10%] z-40 cursor-w-resize" onclick="prevSlide()"></div>
+    <div class="absolute top-0 bottom-16 right-0 w-[10%] z-40 cursor-e-resize" onclick="nextSlide()"></div>
+
+    <script>
+        // --- Helper Components (Functions returning HTML strings) ---
+
+        const SlideLayout = (title, subtitle, content) => `
+            <div class="relative w-full h-full flex flex-col p-8 md:p-16 overflow-hidden bg-slate-900 text-white">
+                <!-- Abstract Background Elements -->
+                <div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute bottom-[-10%] left-[-5%] w-72 h-72 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Header -->
+                <div class="z-10 mb-8 border-l-4 border-teal-500 pl-4">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white">${title}</h2>
+                    ${subtitle ? `<p class="text-teal-400 text-lg mt-1 font-medium">${subtitle}</p>` : ''}
+                </div>
+
+                <!-- Content -->
+                <div class="z-10 flex-1 relative flex flex-col justify-center">
+                    ${content}
+                </div>
+            </div>
+        `;
+
+        const Card = (content, className = "") => `
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl shadow-xl ${className}">
+                ${content}
+            </div>
+        `;
+
+        const StatCard = (value, label, iconName) => `
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center hover:border-teal-500/50 transition-colors duration-300">
+                ${iconName ? `<i data-lucide="${iconName}" class="w-8 h-8 text-teal-400 mb-3"></i>` : ''}
+                <div class="text-4xl md:text-5xl font-bold text-white mb-2">${value}</div>
+                <div class="text-slate-400 text-sm uppercase tracking-wider">${label}</div>
+            </div>
+        `;
+
+        const PlaceholderImage = (label, iconName) => `
+            <div class="w-full h-full min-h-[300px] bg-slate-800 rounded-2xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 group hover:border-teal-500/50 transition-colors">
+                <div class="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mb-4 group-hover:bg-slate-700/80">
+                    <i data-lucide="${iconName || 'layers'}" class="w-10 h-10 text-teal-400"></i>
+                </div>
+                <p class="font-medium text-lg">${label}</p>
+                <p class="text-xs mt-2 opacity-60">Visual Placeholder</p>
+            </div>
+        `;
+
+        // --- Slides Data (HTML Generators) ---
+
+        const slides = [
+            // Slide 1: Title
+            () => `
+                <div class="flex flex-col items-center justify-center h-full text-center z-10 relative overflow-hidden">
+                    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-slate-800 rounded-full opacity-30 animate-pulse"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-slate-700 rounded-full opacity-30"></div>
+                    </div>
+                    
+                    <div class="bg-teal-500/10 px-4 py-1 rounded-full text-teal-400 border border-teal-500/20 text-sm font-semibold tracking-wide mb-6 uppercase z-10">
+                        Portfolio Overview
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-white to-blue-400 pb-2 z-10">
+                        AI-Powered Content &<br />Automation Projects
+                    </h1>
+                    
+                    <p class="text-xl md:text-2xl text-slate-300 max-w-2xl font-light mb-8 z-10">
+                        Aug 2025 – Present
+                    </p>
+
+                    <div class="flex items-center gap-4 text-slate-400 z-10">
+                        <div class="h-px w-12 bg-slate-600"></div>
+                        <span class="text-lg font-medium text-white">Sally Saclauso</span>
+                        <div class="h-px w-12 bg-slate-600"></div>
+                    </div>
+
+                    <p class="mt-4 text-slate-500 text-sm uppercase tracking-widest z-10">
+                        AI Social Media Manager & Automation Specialist
+                    </p>
+                </div>
+            `,
+
+            // Slide 2: Introduction
+            () => SlideLayout("Project Overview", "A 5-Month Multi-Brand Initiative", `
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <p class="text-xl leading-relaxed text-slate-300 mb-8">
+                            “From August 2025 to today, I led a multi-project initiative focused on <span class="text-teal-400 font-semibold">AI content systems</span>, <span class="text-teal-400 font-semibold">workflow automation</span>, digital branding, and community engagement. This portfolio showcases the projects, outcomes, and automation frameworks I built that improved visibility, consistency, and production speed across multiple brands.”
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="brain" class="w-10 h-10 text-teal-400 mb-4"></i><span class="font-semibold text-white">AI Systems</span></div>`, "hover:bg-slate-800 transition-colors")}
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="workflow" class="w-10 h-10 text-blue-400 mb-4"></i><span class="font-semibold text-white">Automation</span></div>`, "hover:bg-slate-800 transition-colors")}
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="pen-tool" class="w-10 h-10 text-purple-400 mb-4"></i><span class="font-semibold text-white">Content</span></div>`, "hover:bg-slate-800 transition-colors")}
+                        ${Card(`<div class="flex flex-col items-center"><i data-lucide="layout" class="w-10 h-10 text-pink-400 mb-4"></i><span class="font-semibold text-white">Workflow</span></div>`, "hover:bg-slate-800 transition-colors")}
+                    </div>
+                </div>
+            `),
+
+            // Slide 3: Key Capabilities
+            () => SlideLayout("Key Capabilities", "Core Competencies & Expertise", `
+                <div class="grid md:grid-cols-2 gap-6">
+                    ${Card(`
+                        <h3 class="text-xl font-bold text-teal-400 mb-6 flex items-center gap-2">
+                            <i data-lucide="zap" class="w-5 h-5"></i> Strategic & Technical
+                        </h3>
+                        <ul class="space-y-4">
+                            ${[
+                                "AI Social Media Management",
+                                "Workflow Automation (Slack + Google Workspace)",
+                                "Brand Systems & Content Engines",
+                                "Data-Driven Strategy & Metrics"
+                            ].map(item => `
+                                <li class="flex items-center gap-3 text-slate-300">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-teal-500 shrink-0"></i>
+                                    ${item}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `, "h-full")}
+
+                    ${Card(`
+                        <h3 class="text-xl font-bold text-blue-400 mb-6 flex items-center gap-2">
+                            <i data-lucide="pen-tool" class="w-5 h-5"></i> Creative & Educational
+                        </h3>
+                        <ul class="space-y-4">
+                            ${[
+                                "Community Marketing Campaigns",
+                                "Custom GPT Coaching & Learning Systems",
+                                "Video & Visual Content Creation",
+                                "Digital Branding & Storytelling"
+                            ].map(item => `
+                                <li class="flex items-center gap-3 text-slate-300">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-blue-500 shrink-0"></i>
+                                    ${item}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `, "h-full")}
+                </div>
+            `),
+
+            // Slide 4: Project 1
+            () => SlideLayout("Chewey School AI Learning Hub", "Aug 2025 – Present", `
+                <div class="grid md:grid-cols-2 gap-12 items-center h-full">
+                    <div class="order-2 md:order-1 space-y-6">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs font-bold px-2 py-1 bg-teal-900 text-teal-300 rounded">Kids Learning</span>
+                            <span class="text-xs font-bold px-2 py-1 bg-blue-900 text-blue-300 rounded">AI Branding</span>
+                            <span class="text-xs font-bold px-2 py-1 bg-purple-900 text-purple-300 rounded">Automation</span>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">Creative Director • Automation Specialist</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-white">Key Impact</h3>
+                            <ul class="space-y-3 text-slate-300">
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Built a full AI-powered content engine for a kids’ learning brand</li>
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Produced 33+ AI videos and multi-series content sets</li>
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Designed mascot, branding, and storytelling assets</li>
+                                <li class="flex gap-3"><span class="text-teal-500">▸</span> Automated workflow for ideation → creation → posting</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2 h-full">
+                        ${PlaceholderImage("Chewey Mascot & Circuit Art", "brain")}
+                    </div>
+                </div>
+            `),
+
+            // Slide 5: Project 2
+            () => SlideLayout("DHT Community Campaign System", "Trick or Treat 2025 (Aug–Oct)", `
+                <div class="grid md:grid-cols-12 gap-8 h-full">
+                    <div class="md:col-span-5 flex flex-col justify-center space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">Campaign Designer • Automation & Media Lead</p>
+                        </div>
+                        <p class="text-slate-300">
+                            Built a digital event marketing system that automated registration, messaging, and content batching for a massive community event.
+                        </p>
+                    </div>
+                    
+                    <div class="md:col-span-7 grid grid-cols-2 gap-4 content-center">
+                        ${StatCard("56.2K", "Page Views", "monitor-play")}
+                        ${StatCard("974%", "Interaction Growth", "trending-up")}
+                        ${StatCard("1,309%", "Msg Increase", "message-square")}
+                        ${StatCard("1,236", "Participants", "users")}
+                    </div>
+                </div>
+            `),
+
+            // Slide 6: Project 3
+            () => SlideLayout("Custom GPT Coaching Program", "Aug 2025 – Present", `
+                <div class="grid md:grid-cols-2 gap-12 items-center h-full">
+                    <div class="h-full">
+                        ${PlaceholderImage("Personalized Coaching Cards", "users")}
+                    </div>
+                    <div class="space-y-8">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">AI Curriculum Designer • Automation Coach</p>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-teal-900/50 p-6 rounded-2xl shadow-xl">
+                            <h3 class="text-lg font-bold text-teal-400 mb-4">Program Achievements</h3>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 font-bold">1</div>
+                                    <span>Built multiple personalized GPT tutors for freelancers to accelerate learning curves.</span>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 font-bold">2</div>
+                                    <span>Designed automated workflow systems to guide student learning paths.</span>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 font-bold">3</div>
+                                    <span><strong>Result:</strong> Students achieved successful skill upgrades & 2 confirmed hires.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `),
+
+            // Slide 7: Project 4
+            () => SlideLayout("Social Media Automation Systems", "Multi-Channel Engine", `
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">AI Content Designer • Automation Engineer</p>
+                        </div>
+                        
+                        <ul class="space-y-6">
+                            <li class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                <strong class="block text-white mb-1">Automated Content Systems</strong>
+                                <span class="text-slate-400 text-sm">Engineered workflows for Reels, TikTok, and Instagram creation and scheduling.</span>
+                            </li>
+                            <li class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                <strong class="block text-white mb-1">Visual Asset Generation</strong>
+                                <span class="text-slate-400 text-sm">Created branded templates and short-form AI videos at scale.</span>
+                            </li>
+                            <li class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                <strong class="block text-white mb-1">Consistency Engine</strong>
+                                <span class="text-slate-400 text-sm">Built a multi-channel posting engine to ensure brand visibility without manual burnout.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="flex flex-col justify-center">
+                        <h3 class="text-center text-slate-500 uppercase tracking-widest mb-8 text-sm">Tech Stack Integrated</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            ${["TikTok", "Instagram", "Canva", "ChatGPT", "Gemini", "Zapier", "Make.com"].map(tool => `
+                                <div class="flex flex-col items-center justify-center p-4 bg-slate-800 rounded-lg border border-slate-700 hover:border-teal-500 transition-colors">
+                                    <span class="font-medium text-white">${tool}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `),
+
+            // Slide 8: Project 5
+            () => SlideLayout("Portfolio & Brand Ecosystem", "Aug 2025 – Present", `
+                <div class="grid md:grid-cols-2 gap-12 items-center h-full">
+                    <div class="h-full">
+                        ${PlaceholderImage("Portfolio Home Layout & Thumbnails", "layout")}
+                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold text-white">Role</h3>
+                            <p class="text-slate-400">Digital Portfolio Architect</p>
+                        </div>
+                        <div class="prose prose-invert">
+                            <p class="text-xl text-slate-300">
+                                Built an entire AI-driven portfolio ecosystem that integrates slide decks, case studies, and content pipelines into a unified experience.
+                            </p>
+                        </div>
+                        <div class="bg-slate-800/50 backdrop-blur-sm border-l-4 border-l-teal-500 border-t border-r border-b border-slate-700 p-6 rounded-r-2xl shadow-xl">
+                            <h4 class="font-bold text-white mb-2">Outcome</h4>
+                            <p class="text-slate-400">Positioned brand identity as AI-forward, creative, and automation-driven, differentiating from traditional portfolios.</p>
+                        </div>
+                    </div>
+                </div>
+            `),
+
+            // Slide 9: Metrics
+            () => SlideLayout("Impact Metrics", "Aug 2025 – Present", `
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 h-full content-center">
+                    ${StatCard("56K+", "Page Views Generated", "monitor-play")}
+                    ${StatCard("974%", "Interaction Increase", "trending-up")}
+                    ${StatCard("50+", "AI Videos Produced", "video")}
+                    ${StatCard("2", "Hires via AI Coaching", "users")}
+                    ${StatCard("3", "Major Campaigns", "layers")}
+                    ${StatCard("∞", "Workflows Designed", "workflow")}
+                </div>
+            `),
+
+            // Slide 10: Testimonials
+            () => SlideLayout("What Clients & Students Say", "Feedback & Results", `
+                <div class="grid md:grid-cols-2 gap-8 h-full content-center">
+                    <div class="relative p-8 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="absolute top-0 right-0 p-6 opacity-20 text-6xl text-teal-500 font-serif leading-none">"</div>
+                        <p class="text-slate-300 text-lg leading-relaxed italic mb-6">
+                            "[Student Name/Quote from portfolio page 2] - The automated workflows totally changed how I approach my daily tasks. I'm saving hours every week."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center font-bold text-white">S</div>
+                            <div>
+                                <p class="font-bold text-white">Student / Client</p>
+                                <p class="text-xs text-teal-400">Freelancer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative p-8 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="absolute top-0 right-0 p-6 opacity-20 text-6xl text-blue-500 font-serif leading-none">"</div>
+                        <p class="text-slate-300 text-lg leading-relaxed italic mb-6">
+                            "[Second Quote from portfolio page 2] - Sally's coaching on Custom GPTs helped me land a new contract. The system she built is incredible."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-bold text-white">C</div>
+                            <div>
+                                <p class="font-bold text-white">Client / Student</p>
+                                <p class="text-xs text-blue-400">Coaching Program</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-xs text-slate-500 mt-6">* Placeholders used for specific quotes from uploaded document.</p>
+            `),
+
+            // Slide 11: Stack
+            () => SlideLayout("Tools & Automation Stack", "The Engine Behind The Work", `
+                <div class="flex flex-col items-center justify-center h-full space-y-12">
+                    <div class="flex flex-wrap justify-center gap-4 max-w-4xl">
+                        ${[
+                            "ChatGPT", "Gemini", "Notion", "Canva", 
+                            "Zapier", "Make.com", "Google Drive", 
+                            "TikTok Studio", "CapCut", "Slack", "Midjourney"
+                        ].map(tech => `
+                            <div class="bg-slate-800 border border-slate-600 px-6 py-4 rounded-2xl text-xl font-medium text-white hover:scale-105 hover:border-teal-500 transition-all shadow-lg hover:shadow-teal-500/20 cursor-default">
+                                ${tech}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <p class="text-slate-400 text-lg max-w-2xl text-center border-t border-slate-800 pt-8">
+                        “These tools power my automation workflows, content engines, and multi-brand systems.”
+                    </p>
+                </div>
+            `),
+
+            // Slide 12: Conclusion
+            () => SlideLayout("", "", `
+                <div class="flex flex-col items-center justify-center text-center h-full z-10">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-teal-500 to-blue-600 rounded-full mb-8 flex items-center justify-center shadow-lg shadow-teal-500/30">
+                        <i data-lucide="zap" class="w-10 h-10 text-white"></i>
+                    </div>
+                    
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                        Let’s Build Your <br/><span class="text-teal-400">AI-Powered Content Engine.</span>
+                    </h2>
+                    
+                    <p class="text-xl text-slate-300 mb-12 max-w-2xl">
+                        Available for EA, Automation Specialist, Workflow Builder & Social Media Automation roles.
+                    </p>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto text-white">
+                        <button class="flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1 shadow-lg shadow-teal-500/20">
+                            <i data-lucide="calendar" class="w-5 h-5"></i> Book a Call
+                        </button>
+                        <button class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1">
+                            <i data-lucide="layout" class="w-5 h-5"></i> View Full Portfolio
+                        </button>
+                        <button class="flex items-center justify-center gap-2 bg-[#0077b5] hover:bg-[#006396] px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i> Connect on LinkedIn
+                        </button>
+                    </div>
+                </div>
+            `)
+        ];
+
+        // --- Logic ---
+
+        let currentSlideIndex = 0;
+        const app = document.getElementById('app');
+        const counter = document.getElementById('slide-counter');
+
+        function renderSlide() {
+            // Render content
+            app.innerHTML = slides[currentSlideIndex]();
+            
+            // Update counter
+            counter.innerText = `Slide ${currentSlideIndex + 1} / ${slides.length}`;
+            
+            // Re-initialize icons for the new content
+            lucide.createIcons();
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            renderSlide();
+        }
+
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+            renderSlide();
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initial Render
+        renderSlide();
+
+    </script>
+</body>
+</html>
